@@ -10,7 +10,8 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
-
+class UArcaneMagic_PlayerMovementComp;
+class UCapsuleComponent;
 struct  FInputActionValue;
 
 UCLASS()
@@ -75,18 +76,21 @@ public:
 
 	void PlayerMove(const FInputActionValue& Value);
 	void PlayerLook(const FInputActionValue& Value);
+
 	void PlayerJump();
-
-	void PlayerSprint();
-	void PlayerEndSprint();
-
-	void PlayerCrouch();
-	void PlayerStopCrouch();
 
 	void PlayerSlide();
 	void PlayerStopSlide();
 
+	void CheckForWallCollision();
 #pragma endregion
 
+protected:
 
+	float WallKickDetectionRange;
+	FVector walkKickDirection;
+
+	bool playerCanJump;
+	bool playerCanWallKick;
+	bool playerIsSliding;
 };
