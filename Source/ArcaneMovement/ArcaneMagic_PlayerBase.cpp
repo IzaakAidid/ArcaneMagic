@@ -77,6 +77,11 @@ void AArcaneMagic_PlayerBase::Tick(float DeltaTime)
 		playerCanWallKick = false;
 		walkKickDirection = FVector::Zero();
 	}
+
+	if (playerIsSliding)
+	{
+		GetCharacterMovement()->AddForce(GetActorForwardVector() * 100);
+	}
 }
 
 // Called to bind functionality to input
@@ -92,6 +97,7 @@ void AArcaneMagic_PlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerI
 
 		// Crouch/Slide
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &AArcaneMagic_PlayerBase::PlayerSlide);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AArcaneMagic_PlayerBase::PlayerStopSlide);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AArcaneMagic_PlayerBase::PlayerMove);
@@ -157,14 +163,12 @@ void AArcaneMagic_PlayerBase::PlayerJump()
 
 void AArcaneMagic_PlayerBase::PlayerSlide()
 {
-	//slide
+	playerIsSliding = true;
 }
 
 void AArcaneMagic_PlayerBase::PlayerStopSlide()
 {
-	//if a jump was called, do nothing i guess
-
-	//if u run out of speed, go into a crouch
+	playerIsSliding = false;
 }
 
 void AArcaneMagic_PlayerBase::CheckForWallCollision()
@@ -186,10 +190,10 @@ void AArcaneMagic_PlayerBase::CheckForWallCollision()
 	FVector leftTraceEndPOS = traceStartPOS + (GetActorRightVector() * WallKickDetectionRange);
 	bool leftHit = GetWorld()->LineTraceSingleByChannel(
 		LeftHitResult,           // Struct to store hit data
-		traceStartPOS,       // Start of the raytrace
+		traceStartPOS,			 // Start of the raytrace
 		leftTraceEndPOS,         // End of the raytrace
-		ECC_WorldStatic,     // Collision channel (checks objects static objects / map geometry ) (in theory)
-		TraceParams          // rn its just ignoring the player in the raytrace but can be changed to be more precise
+		ECC_WorldStatic,		 // Collision channel (checks objects static objects / map geometry ) (in theory)
+		TraceParams				 // rn its just ignoring the player in the raytrace but can be changed to be more precise
 	);
 
 	//DrawDebugLine(GetWorld(), traceStartPOS, leftTraceEndPOS, leftHit ? FColor::Green : FColor::Red, false, 0.1f, 0, 1.0f);
@@ -200,11 +204,11 @@ void AArcaneMagic_PlayerBase::CheckForWallCollision()
 	FVector RightAngle = FVector(GetActorForwardVector() - GetActorRightVector());
 	FVector rightTraceEndPOS = traceStartPOS + (-GetActorRightVector() * WallKickDetectionRange);
 	bool rightHit = GetWorld()->LineTraceSingleByChannel(
-		RightHitResult,           // Struct to store hit data
-		traceStartPOS,       // Start of the raytrace
-		rightTraceEndPOS,         // End of the raytrace
-		ECC_WorldStatic,     // Collision channel (checks objects static objects / map geometry ) (in theory)
-		TraceParams          // rn its just ignoring the player in the raytrace but can be changed to be more precise
+		RightHitResult,          // Struct to store hit data
+		traceStartPOS,			 // Start of the raytrace
+		rightTraceEndPOS,        // End of the raytrace
+		ECC_WorldStatic,		 // Collision channel (checks objects static objects / map geometry ) (in theory)
+		TraceParams				 // rn its just ignoring the player in the raytrace but can be changed to be more precise
 	);
 
 	//DrawDebugLine(GetWorld(), traceStartPOS, rightTraceEndPOS, rightHit ? FColor::Green : FColor::Red, false, 0.1f, 0, 1.0f);
@@ -236,5 +240,10 @@ void AArcaneMagic_PlayerBase::CheckForWallCollision()
 		playerCanWallKick = false;
 		walkKickDirection = FVector::Zero();
 	}
+
+}
+
+void AArcaneMagic_PlayerBase::QuakeLean()
+{
 
 }

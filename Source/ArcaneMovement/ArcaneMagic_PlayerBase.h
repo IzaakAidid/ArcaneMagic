@@ -83,6 +83,7 @@ public:
 	void PlayerStopSlide();
 
 	void CheckForWallCollision();
+	void QuakeLean();
 #pragma endregion
 
 protected:
